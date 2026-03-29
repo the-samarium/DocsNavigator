@@ -1,4 +1,4 @@
-# Docsnavigator
+# DocsNavigator
 
 A CLI-based Retrieval-Augmented Generation (RAG) app using LangChain, FAISS, and Ollama.
 It crawls website docs, chunks content, builds a local vector index, and answers questions with context retrieval.
