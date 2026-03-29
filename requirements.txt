@@ -1,0 +1,21 @@
+
+# core langchain
+langchain
+langchain-core
+langchain-community
+langchain-ollama
+langchain-text-splitters
+ 
+# vector store
+faiss-cpu
+ 
+# web scraping / loading
+beautifulsoup4
+requests
+ 
+# environment
+python-dotenv
+ 
+# cli ui
+rich
+ 

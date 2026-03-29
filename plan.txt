@@ -1,0 +1,8 @@
+Building a - Any documentation summerizer and RAG based bot using langchain . Cut the workflow into parts :
+1. Document loading - From Web
+2. Text splitting + Embedding + Storing in Vectore DB (Chroma/Fiass)
+3. Retriver : retrive from FIASS/Chroma
+4. Chaining : chaining all this and providing context+ query to LLM
+5. Results : Firstly chat directly in cli, after that , design a ui
+
+// Features to add after working pipeline : Searching documentation page directly , afte giving website name , Chat history
