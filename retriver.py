@@ -20,8 +20,8 @@ def retrive(query):
     retriever = vectorstore.as_retriever(
         search_type="mmr",
         search_kwargs={
-            "k": 4,          # fewer final chunks → faster LLM
-            "fetch_k": 10,   # not too large → faster retrieval
+            "k": 8,          # fewer final chunks → faster LLM
+            "fetch_k": 20,   # not too large → faster retrieval
             "lambda_mult": 0.6,
     }
     )

@@ -22,7 +22,7 @@ CHAT_WIDTH = 96
 console = Console(width=CHAT_WIDTH)
 
 # ── LLM + Chain ────────────────────────────────────────────
-llm = ChatOllama(model="glm-5:cloud", temperature=0.3)
+llm = ChatOllama(model="glm-5:cloud", temperature=0.3, num_ctx=3124)
 rag_chain = build_rag_chain(llm)
 
 def clean_response(content: str) -> str:

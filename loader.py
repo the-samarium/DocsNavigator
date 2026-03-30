@@ -22,8 +22,8 @@ def load_documents(url: str):
         url=base_url,
         extractor=bs4_extractor,
         prevent_outside=True,  # stay within the same domain
-        max_depth=8,  # reduce crawl scope for faster ingestion, # remove this to load all pages , but loading and injestion will take time
-        timeout=10,
+        max_depth=2,  # reduce crawl scope for faster ingestion, # remove this to load all pages , but loading and injestion will take time
+        timeout=30,
     )
 
     docs = loader.load()
