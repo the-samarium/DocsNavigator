@@ -7,7 +7,7 @@ It crawls website docs, chunks content, builds a local vector index, and answers
 
 ### Terminal UI
 
-![DocsNavigator Terminal UI](assets/docsnavigator-ui.png)
+![DocsNavigator Terminal UI](assets/image.png)
 
 ## Required Services
 
