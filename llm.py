@@ -3,38 +3,46 @@ import os
 import re
 import shutil
 import time
+
 from langchain_ollama import ChatOllama
+from rich.console import Console
+from rich.live import Live
+from rich.markup import escape
+from rich.padding import Padding
+from rich.panel import Panel
+from rich.prompt import Confirm, Prompt
+from rich.spinner import Spinner
+from rich.text import Text
+
 from chain import build_rag_chain
 from ingest import ingest
+from dotenv import load_dotenv
 
-from rich.console import Console
-from rich.panel import Panel
-from rich.prompt import Prompt, Confirm
-from rich.spinner import Spinner
-from rich.live import Live
-from rich.text import Text
-from rich.padding import Padding
-from rich.markup import escape
-
+load_dotenv()
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["USER_AGENT"] = "ProjectRAG/1.0"
 
 CHAT_WIDTH = 96
 console = Console(width=CHAT_WIDTH)
 
 # ── LLM + Chain ────────────────────────────────────────────
-llm = ChatOllama(model="glm-5:cloud", temperature=0.3, num_ctx=3124)
+llm = ChatOllama(model="mistral:7b", temperature=0.3, num_ctx=3124)
 rag_chain = build_rag_chain(llm)
+
 
 def clean_response(content: str) -> str:
     content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
     return content.strip()
+
 
 # ── UI ─────────────────────────────────────────────────────
 def section_divider(label: str | None = None):
     line = "─" * 86
     if label:
         console.print(Padding(f"[dim]{line}[/dim]", (0, 2)))
-        console.print(Padding(f"[bold dark_orange3]{label}[/bold dark_orange3]", (0, 2)))
+        console.print(
+            Padding(f"[bold dark_orange3]{label}[/bold dark_orange3]", (0, 2))
+        )
         console.print(Padding(f"[dim]{line}[/dim]", (0, 2)))
     else:
         console.print(Padding(f"[dim]{line}[/dim]", (0, 2)))
@@ -68,11 +76,21 @@ def banner():
     section_divider()
     console.print()
 
+
 def ask_website() -> str:
     section_divider("URL")
     console.print()
-    console.print(Padding("[bold dark_orange3]Which documentation do you want to load?[/bold dark_orange3]", (0, 2)))
-    console.print(Padding("[dim]All subpages under the URL will be crawled and indexed.[/dim]", (0, 2)))
+    console.print(
+        Padding(
+            "[bold dark_orange3]Which documentation do you want to load?[/bold dark_orange3]",
+            (0, 2),
+        )
+    )
+    console.print(
+        Padding(
+            "[dim]All subpages under the URL will be crawled and indexed.[/dim]", (0, 2)
+        )
+    )
     console.print()
     while True:
         url = Prompt.ask("  [dark_orange3]›[/dark_orange3] [dim]URL[/dim]").strip()
@@ -85,6 +103,7 @@ def ask_website() -> str:
             )
             return url
         console.print(Padding("[dark_red]✘  URL cannot be empty.[/dark_red]", (0, 2)))
+
 
 def do_ingest(url: str):
     console.print()
@@ -102,16 +121,26 @@ def do_ingest(url: str):
         ):
             ingest(url)
     except Exception as e:
-        console.print(Padding(f"[dark_red]✘  Ingestion failed: {escape(str(e))}[/dark_red]", (0, 2)))
+        console.print(
+            Padding(
+                f"[dark_red]✘  Ingestion failed: {escape(str(e))}[/dark_red]", (0, 2)
+            )
+        )
         return False
 
     elapsed = time.time() - start
     mins, secs = divmod(int(elapsed), 60)
     timer_str = f"{mins}m {secs}s" if mins else f"{secs}s"
 
-    console.print(Padding(f"[bold orange1]✔  Knowledge base ready.[/bold orange1]  [dim]({timer_str})[/dim]", (0, 2)))
+    console.print(
+        Padding(
+            f"[bold orange1]✔  Knowledge base ready.[/bold orange1]  [dim]({timer_str})[/dim]",
+            (0, 2),
+        )
+    )
     console.print()
     return True
+
 
 def startup_flow():
     if not os.path.exists("faiss_index"):
@@ -123,7 +152,12 @@ def startup_flow():
         # section_divider("STARTUP")
         console.print(Padding("[bold dark_orange3]Startup[/bold dark_orange3]", (0, 2)))
         console.print()
-        console.print(Padding("[orange1]●[/orange1]  [bold dark_orange3]Existing knowledge base found.[/bold dark_orange3]", (0, 2)))
+        console.print(
+            Padding(
+                "[orange1]●[/orange1]  [bold dark_orange3]Existing knowledge base found.[/bold dark_orange3]",
+                (0, 2),
+            )
+        )
         console.print()
         continue_chat = Confirm.ask(
             "  [dark_orange3]›[/dark_orange3] [dim]Continue chatting on existing knowledge base?[/dim]",
@@ -132,7 +166,9 @@ def startup_flow():
         console.print()
 
         if continue_chat:
-            console.print(Padding("[dim]Continuing on existing knowledge base.[/dim]", (0, 2)))
+            console.print(
+                Padding("[dim]Continuing on existing knowledge base.[/dim]", (0, 2))
+            )
             console.print()
         else:
             wipe = Confirm.ask(
@@ -151,6 +187,7 @@ def startup_flow():
     console.print()
     return True
 
+
 def switch_flow():
     console.print()
     wipe = Confirm.ask(
@@ -164,14 +201,23 @@ def switch_flow():
     url = ask_website()
     return do_ingest(url)
 
+
 def print_response(text: str):
     # Only agent/user labels use a different orange shade for quick visual distinction.
-    console.print(f"  [bold orange2]Assistant[/bold orange2] [dim]›[/dim]  {escape(text)}")
+    console.print(
+        f"  [bold orange2]Assistant[/bold orange2] [dim]›[/dim]  {escape(text)}"
+    )
+
 
 def run_application():
     banner()
     if not startup_flow():
-        console.print(Padding("[dark_red]Cannot continue without a valid knowledge base. Restart and try again.[/dark_red]", (0, 2)))
+        console.print(
+            Padding(
+                "[dark_red]Cannot continue without a valid knowledge base. Restart and try again.[/dark_red]",
+                (0, 2),
+            )
+        )
         return
 
     console.print(
@@ -192,18 +238,28 @@ def run_application():
         if query.strip().lower() in ["exit", "quit", "q"]:
             console.print()
             section_divider()
-            console.print(Padding("[bold dark_orange3]Exiting ...[/bold dark_orange3]", (1, 2)))
+            console.print(
+                Padding("[bold dark_orange3]Exiting ...[/bold dark_orange3]", (1, 2))
+            )
             console.print()
             break
 
         if query.strip().lower() == "switch":
             if not switch_flow():
-                console.print(Padding("[dark_red]Switch failed. Keeping current knowledge base.[/dark_red]", (0, 2)))
+                console.print(
+                    Padding(
+                        "[dark_red]Switch failed. Keeping current knowledge base.[/dark_red]",
+                        (0, 2),
+                    )
+                )
             continue
 
         console.print()
         with Live(
-            Spinner("dots2", text=Text(" Retrieving context and generating answer …", style="dim")),
+            Spinner(
+                "dots2",
+                text=Text(" Retrieving context and generating answer …", style="dim"),
+            ),
             console=console,
             refresh_per_second=12,
             transient=True,
@@ -212,6 +268,7 @@ def run_application():
             response = clean_response(result.content)
 
         print_response(response)
+
 
 if __name__ == "__main__":
     run_application()

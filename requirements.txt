@@ -5,6 +5,7 @@ langchain-core
 langchain-community
 langchain-ollama
 langchain-text-splitters
+langsmith
  
 # vector store
 faiss-cpu
